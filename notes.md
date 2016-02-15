@@ -116,6 +116,17 @@ GROUP BY home_state, first_name
 ORDER BY COUNT(*) DESC, home_state, first_name;
 ```
 
+Notice that Grover Cleveland of New York comes up as a dupe. To fix:
+```sql
+SELECT home_state, first_name, COUNT(*)
+FROM (
+    SELECT * FROM sql_trial.presidents
+    GROUP BY first_name, middle_name, last_name
+) as unique_presidents
+GROUP BY home_state, first_name
+ORDER BY COUNT(*) DESC, home_state, first_name;
+```
+
 7. Which states have given birth to more than two presidents after 1900?
 ```sql
 SELECT home_state, count(*) as counter
@@ -134,8 +145,85 @@ WHERE date_of_death > '1939-09-01'
 AND date_of_birth < '1945-09-02';
 ```
 
+## Flights: JOINS
+1. How many routes are there that originate in JFK?
+```sql
+SELECT COUNT(*)
+FROM intermediate_sql.routes r
+JOIN intermediate_sql.airports a
+ON r.origin_id = a.id
+WHERE a.iata_faa = 'JFK';
+;``` -> 456
+
+2. How many routes are there that end up at JFK?
+```sql
+SELECT COUNT(*)
+FROM intermediate_sql.routes r
+JOIN intermediate_sql.airports a
+ON r.dest_id = a.id
+WHERE a.iata_faa = 'JFK';
+;``` -> 455
+
+3. How many airlines does the US have?
+
+```sql
+SELECT COUNT(*)
+FROM sql_trial.airlines
+WHERE country = 'United States'
+AND active = 'Y';
+``` -> 141
+
+4. How many airports are there in the US?
+```sql
+SELECT COUNT(*) FROM sql_trial.airports
+WHERE country = 'United States';
+``` -> 1697
+
+5. Which are the top 10 airports that have the highest difference in incoming vs. outgoing routes?
+```sql
+SELECT incoming.code, inflow, outflow, ABS(inflow - outflow) as diff
+from (
+    (SELECT
+        a.iata_faa as code,
+        COUNT(a.iata_faa) as inflow
+    FROM intermediate_sql.routes r
+    JOIN intermediate_sql.airports a
+    ON r.dest_id = a.id
+    GROUP BY a.iata_faa) as incoming
+
+    JOIN (SELECT
+        a.iata_faa as code,
+        COUNT(a.iata_faa) as outflow
+    FROM intermediate_sql.routes r
+    JOIN intermediate_sql.airports a
+    ON r.origin_id = a.id
+    GROUP BY a.iata_faa) as outgoing
+
+    ON incoming.code = outgoing.code
+
+)
+ORDER BY diff DESC
+LIMIT 10;
+```
+
+
 
 ## Subqueries
+
+0. Which president was born most recently?
+
+WRONG:
+`SELECT * FROM intermediate_sql.presidents WHERE date_of_birth = MIN(date_of_birth)`;
+- Cannot use aggregates in WHERE clauses.
+
+```sql
+SELECT *
+FROM intermediate_sql.presidents
+WHERE date_of_birth = (
+    SELECT MIN(birth)
+    FROM intermediate_sql.presidents
+);
+```
 
 1. Get list of presidents from top three states by president count
 ```sql
@@ -158,6 +246,11 @@ WHERE home_state IN (
 )
 ORDER BY home_state, last_name, first_name;
 ```
+1. Inner query lists the top there states with their counts.
+2. Next extracts the minimum of those counts.
+3. Next out lists the states with that count or higher.
+4. Outermost query takes presidents whose state falls in that list.
+
 
 2. Get the oldest president in each state
 
@@ -203,3 +296,24 @@ ORDER BY
     home_state,
     last_name
 ;```
+
+
+# Indexes
+1. Index
+- Create iata_faa index on airports table.
+- Look at query stats for the following query.
+
+```sql
+SELECT * FROM sql_trial.airports
+where iata_faa in ('JFK', 'LAX');
+```
+
+2. Unique constraint
+- Create unique together constraint for date_took_office, and date_left_office.
+- Show that the following insert fails:
+
+```sql
+INSERT INTO intermediate_sql.presidents
+(last_name, first_name, date_of_birth, home_state, party, date_took_office, date_left_office)
+VALUES ('Trump', 'Donald', '1946-06-14', 'New York', 'Republican', '2001-01-20', '2009-01-20');
+```

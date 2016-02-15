@@ -7,11 +7,11 @@ Build a stronger foundation in SQL, an essential skill for analyzing data. Becom
 - website: [simplefractal.com](http://simplefractal.com)
 
 # What do you need?
-- MySQL installed on your [computer](https://dev.mysql.com/downloads/mysql/).
-- Graphical User Interface (GUI) installed on your [computer](https://dev.mysql.com/downloads/workbench/)
+- [MySQL Workbench](https://dev.mysql.com/downloads/workbench/) installed on your computer.
 
 # Data sets
 - US Presidents
+- Flights
 
 # SQL Review
 - Aggregation
@@ -21,8 +21,10 @@ Build a stronger foundation in SQL, an essential skill for analyzing data. Becom
 - Tuples
 
 # New topics
-- Correlated subqueries
+- Subqueries
 - Loading from CSV
-- Modeling best practices
+- Data Modeling
 - Indexes
 - Views
+- Logic
+- Creating/updating/deleting tables/records

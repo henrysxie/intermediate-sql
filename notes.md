@@ -1,73 +1,4 @@
-# Presidents
-
-## Load in from CSV
-
-```sql
-DROP TABLE IF EXISTS intermediate_sql.presidents;
-
-CREATE TABLE intermediate_sql.presidents (
-    id MEDIUMINT NOT NULL AUTO_INCREMENT,
-    last_name VARCHAR(255) NOT NULL,
-    first_name VARCHAR(255) NOT NULL,
-    middle_name VARCHAR(255),
-    date_of_birth DATE NOT NULL,
-    date_of_death DATE,
-    home_state VARCHAR(100) NOT NULL,
-    party VARCHAR(255) NOT NULL,
-    date_took_office DATE,
-    date_left_office DATE,
-    assassination_attempt BOOLEAN DEFAULT FALSE,
-    assassinated BOOLEAN DEFAULT FALSE,
-    religion VARCHAR(255),
-    PRIMARY KEY (id)
-);
-
-LOAD DATA LOCAL
-
-    INFILE "/Users/henryxie/Development/teaching/intermediate-sql/data/presidents.csv"
-
-    INTO TABLE intermediate_sql.presidents
-
-    FIELDS
-        TERMINATED BY ','
-        ENCLOSED BY '"'
-
-    LINES
-        TERMINATED BY '\n'
-
-    IGNORE 1 LINES
-    (
-        id, last_name, first_name, middle_name, @date_of_birth, @date_of_death,
-        home_state, party, @date_took_office, @date_left_office, @assassination_attempt,
-        @assassinated, religion
-    )
-
-    SET date_of_birth = CASE WHEN @date_of_birth != ''
-                            THEN STR_TO_DATE(@date_of_birth, '%m/%d/%Y')
-                            ELSE NULL
-                        END,
-        date_of_death = CASE WHEN @date_of_death !=''
-                            THEN STR_TO_DATE(@date_of_death, '%m/%d/%Y')
-                            ELSE NULL
-                        END,
-        date_took_office = CASE WHEN @date_took_office !=''
-                            THEN STR_TO_DATE(@date_took_office, '%m/%d/%Y')
-                            ELSE NULL
-                        END,
-        date_left_office = CASE WHEN @date_left_office !=''
-                            THEN STR_TO_DATE(@date_left_office, '%m/%d/%Y')
-                            ELSE NULL
-                        END,
-        assassination_attempt = @assassination_attempt = 'true',
-        assassinated = @assassinated = 'true'
-    ;
-```
-- This demonstrates how to read in CSV files into a SQL table.
-- Use `SET` to "convert" fields before insertion.
-- Use `CASE` to add logic.
-
-
-## Review
+# Review
 1. How many US presidents have there been? How many are dead now?
 
     ```sql
@@ -221,7 +152,7 @@ LOAD DATA LOCAL
     WRONG:
     ```sql
     SELECT * FROM intermediate_sql.presidents
-    WHERE date_of_birth = MIN(date_of_birth);
+    WHERE date_of_birth = MAX(date_of_birth);
     ```
     - Cannot use aggregates in WHERE clauses.
 
@@ -230,7 +161,7 @@ LOAD DATA LOCAL
     SELECT *
     FROM intermediate_sql.presidents
     WHERE date_of_birth = (
-        SELECT MIN(birth)
+        SELECT MAX(birth)
         FROM intermediate_sql.presidents
     );
     ```
@@ -344,6 +275,34 @@ LOAD DATA LOCAL
         ```
         - `JOIN` condition handles the max age requirement.
 
+
+# Data Modeling
+1. WE DO: Author, Books, and Editions
+    - Use EER diagram in MySQL Workbench
+    - Forward engineer tables to create them
+    - Models
+        - Author
+            - first_name
+            - last_name
+            - middle_name
+            - dob
+            - dod
+        - Book
+            - title
+            - ISBN
+        - Edition
+            - edition
+    - Relationships
+        - Author M2M Book
+        - Edition FK -> Book
+
+2. YOU DO: Purchases
+    - Purchase
+    - Customer
+    - Store
+    - Product
+
+
 # Indexes
 
 1. Index
@@ -364,3 +323,69 @@ LOAD DATA LOCAL
     (last_name, first_name, date_of_birth, home_state, party, date_took_office, date_left_office)
     VALUES ('Trump', 'Donald', '1946-06-14', 'New York', 'Republican', '2001-01-20', '2009-01-20');
     ```
+
+# Loading from CSV
+
+```sql
+DROP TABLE IF EXISTS intermediate_sql.presidents;
+
+CREATE TABLE intermediate_sql.presidents (
+    id MEDIUMINT NOT NULL AUTO_INCREMENT,
+    last_name VARCHAR(255) NOT NULL,
+    first_name VARCHAR(255) NOT NULL,
+    middle_name VARCHAR(255),
+    date_of_birth DATE NOT NULL,
+    date_of_death DATE,
+    home_state VARCHAR(100) NOT NULL,
+    party VARCHAR(255) NOT NULL,
+    date_took_office DATE,
+    date_left_office DATE,
+    assassination_attempt BOOLEAN DEFAULT FALSE,
+    assassinated BOOLEAN DEFAULT FALSE,
+    religion VARCHAR(255),
+    PRIMARY KEY (id)
+);
+
+LOAD DATA LOCAL
+
+    INFILE "/Users/henryxie/Development/teaching/intermediate-sql/data/presidents.csv"
+
+    INTO TABLE intermediate_sql.presidents
+
+    FIELDS
+        TERMINATED BY ','
+        ENCLOSED BY '"'
+
+    LINES
+        TERMINATED BY '\n'
+
+    IGNORE 1 LINES
+    (
+        id, last_name, first_name, middle_name, @date_of_birth, @date_of_death,
+        home_state, party, @date_took_office, @date_left_office, @assassination_attempt,
+        @assassinated, religion
+    )
+
+    SET date_of_birth = CASE WHEN @date_of_birth != ''
+                            THEN STR_TO_DATE(@date_of_birth, '%m/%d/%Y')
+                            ELSE NULL
+                        END,
+        date_of_death = CASE WHEN @date_of_death !=''
+                            THEN STR_TO_DATE(@date_of_death, '%m/%d/%Y')
+                            ELSE NULL
+                        END,
+        date_took_office = CASE WHEN @date_took_office !=''
+                            THEN STR_TO_DATE(@date_took_office, '%m/%d/%Y')
+                            ELSE NULL
+                        END,
+        date_left_office = CASE WHEN @date_left_office !=''
+                            THEN STR_TO_DATE(@date_left_office, '%m/%d/%Y')
+                            ELSE NULL
+                        END,
+        assassination_attempt = @assassination_attempt = 'true',
+        assassinated = @assassinated = 'true'
+    ;
+```
+- This demonstrates how to read in CSV files into a SQL table.
+- Use `SET` to "convert" fields before insertion.
+- Use `CASE` to add logic.

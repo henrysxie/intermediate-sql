@@ -1,8 +1,26 @@
 # Presidents
 
 ## Load in from CSV
+
 ```sql
-TRUNCATE TABLE intermediate_sql.presidents;
+DROP TABLE IF EXISTS intermediate_sql.presidents;
+
+CREATE TABLE intermediate_sql.presidents (
+    id MEDIUMINT NOT NULL AUTO_INCREMENT,
+    last_name VARCHAR(255) NOT NULL,
+    first_name VARCHAR(255) NOT NULL,
+    middle_name VARCHAR(255),
+    date_of_birth DATE NOT NULL,
+    date_of_death DATE,
+    home_state VARCHAR(100) NOT NULL,
+    party VARCHAR(255) NOT NULL,
+    date_took_office DATE,
+    date_left_office DATE,
+    assassination_attempt BOOLEAN DEFAULT FALSE,
+    assassinated BOOLEAN DEFAULT FALSE,
+    religion VARCHAR(255),
+    PRIMARY KEY (id)
+);
 
 LOAD DATA LOCAL
 
@@ -51,17 +69,20 @@ LOAD DATA LOCAL
 
 ## Review
 1. How many US presidents have there been? How many are dead now?
+
 ```sql
 SELECT
     COUNT(*) as president_count,
     COUNT(date_of_death) AS num_dead_presidents
 FROM
     intermediate_sql.presidents
-;```
+;
+```
 
 - This reviews `COUNT`. Recall that it only counts non-NULL values.
 
 2. Which presidents are still alive and how old are they?
+
 ```sql
 SELECT
     first_name, middle_name, last_name, FLOOR(DATEDIFF(current_date(), date_of_birth)/365) as age
@@ -69,7 +90,8 @@ FROM
     intermediate_sql.presidents
 WHERE
     date_of_death IS NULL
-;```
+;
+```
 - Reviews use of functions.
 
 
@@ -82,7 +104,8 @@ SELECT
     END as full_name
 FROM
     intermediate_sql.presidents
-;```
+;
+```
 - Reviews `CONCAT` and `CASE` logic.
 
 
@@ -153,7 +176,9 @@ FROM intermediate_sql.routes r
 JOIN intermediate_sql.airports a
 ON r.origin_id = a.id
 WHERE a.iata_faa = 'JFK';
-;``` -> 456
+;
+```
+- 456
 
 2. How many routes are there that end up at JFK?
 ```sql
@@ -162,7 +187,9 @@ FROM intermediate_sql.routes r
 JOIN intermediate_sql.airports a
 ON r.dest_id = a.id
 WHERE a.iata_faa = 'JFK';
-;``` -> 455
+;
+```
+- 455
 
 3. How many airlines does the US have?
 
@@ -171,13 +198,15 @@ SELECT COUNT(*)
 FROM sql_trial.airlines
 WHERE country = 'United States'
 AND active = 'Y';
-``` -> 141
+```
+- 141
 
 4. How many airports are there in the US?
 ```sql
 SELECT COUNT(*) FROM sql_trial.airports
 WHERE country = 'United States';
-``` -> 1697
+```
+- 1697
 
 5. Which are the top 10 airports that have the highest difference in incoming vs. outgoing routes?
 ```sql
@@ -205,8 +234,6 @@ from (
 ORDER BY diff DESC
 LIMIT 10;
 ```
-
-
 
 ## Subqueries
 
@@ -255,6 +282,7 @@ ORDER BY home_state, last_name, first_name;
 2. Get the oldest president in each state
 
 2A. Create a view for the age of the presidents
+
 ```sql
 DROP VIEW IF EXISTS intermediate_sql.presidents_age;
 CREATE VIEW intermediate_sql.presidents_age AS
@@ -269,6 +297,7 @@ ORDER BY age DESC;
 ```
 
 2B. Create count, average/max/min age columns for each state in a view
+
 ```sql
 DROP VIEW IF EXISTS intermediate_sql.presidents_agg;
 CREATE VIEW intermediate_sql.presidents_agg AS
@@ -286,6 +315,7 @@ FROM intermediate_sql.presidents_agg;
 ```
 
 2C. Join our age table with our agg table
+
 ```sql
 SELECT sub.home_state, sub.last_name, sub.age
 FROM intermediate_sql.presidents_age sub
@@ -295,7 +325,8 @@ ORDER BY
     age DESC,
     home_state,
     last_name
-;```
+;
+```
 
 
 # Indexes
@@ -305,7 +336,7 @@ ORDER BY
 
 ```sql
 SELECT * FROM sql_trial.airports
-where iata_faa in ('JFK', 'LAX');
+WHERE iata_faa in ('JFK', 'LAX');
 ```
 
 2. Unique constraint

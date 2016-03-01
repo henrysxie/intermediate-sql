@@ -10,8 +10,8 @@ Build a stronger foundation in SQL, an essential skill for analyzing data. Becom
 - [MySQL Workbench](https://dev.mysql.com/downloads/workbench/) installed on your computer.
 
 # Data sets
-- [US Presidents](https://www.dropbox.com/s/98xmh2b0y9s7x70/presidents.sql?dl=0)
-- [Flights](https://www.dropbox.com/s/eyasjyb68me70bz/flights.sql?dl=0)
+- <a href="https://www.dropbox.com/s/98xmh2b0y9s7x70/presidents.sql?dl=0" target="_blank">US Presidents</a>
+- <a href="https://www.dropbox.com/s/eyasjyb68me70bz/flights.sql?dl=0" target="_blank">Flights</a>
 
 # SQL Review
 - Aggregation

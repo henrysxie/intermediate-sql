@@ -228,52 +228,52 @@
 
     A. Create a view for the age of the presidents
 
-        ```sql
-        DROP VIEW IF EXISTS intermediate_sql.presidents_age;
-        CREATE VIEW intermediate_sql.presidents_age AS
-            SELECT last_name, home_state, COALESCE(
-                FLOOR(DATEDIFF(date_of_death, date_of_birth) / 365),
-                FLOOR(DATEDIFF(CURRENT_DATE(), date_of_birth) / 365)
-            ) as age
-            FROM intermediate_sql.presidents;
-        SELECT *
-        FROM intermediate_sql.presidents_age
-        ORDER BY age DESC;
-        ```
-        - A view is like a virtual table. It keeps that data in place, for later queries.
+    ```sql
+    DROP VIEW IF EXISTS intermediate_sql.presidents_age;
+    CREATE VIEW intermediate_sql.presidents_age AS
+        SELECT last_name, home_state, COALESCE(
+            FLOOR(DATEDIFF(date_of_death, date_of_birth) / 365),
+            FLOOR(DATEDIFF(CURRENT_DATE(), date_of_birth) / 365)
+        ) as age
+        FROM intermediate_sql.presidents;
+    SELECT *
+    FROM intermediate_sql.presidents_age
+    ORDER BY age DESC;
+    ```
+    - A view is like a virtual table. It keeps that data in place, for later queries.
 
     B. Create count, average/max/min age columns for each state in a view
 
-        ```sql
-        DROP VIEW IF EXISTS intermediate_sql.presidents_agg;
-        CREATE VIEW intermediate_sql.presidents_agg AS
-            SELECT
-                home_state,
-                count(home_state) as state_count,
-                ROUND(AVG(age), 1) as avg_age,
-                MIN(age) as min_age,
-                MAX(age) as max_age
-            FROM intermediate_sql.presidents_age
-            GROUP BY home_state
-            ORDER BY state_count DESC;
-        SELECT *
-        FROM intermediate_sql.presidents_agg;
-        ```
+    ```sql
+    DROP VIEW IF EXISTS intermediate_sql.presidents_agg;
+    CREATE VIEW intermediate_sql.presidents_agg AS
+        SELECT
+            home_state,
+            count(home_state) as state_count,
+            ROUND(AVG(age), 1) as avg_age,
+            MIN(age) as min_age,
+            MAX(age) as max_age
+        FROM intermediate_sql.presidents_age
+        GROUP BY home_state
+        ORDER BY state_count DESC;
+    SELECT *
+    FROM intermediate_sql.presidents_agg;
+    ```
 
     2C. Join our age table with our agg table
 
-        ```sql
-        SELECT sub.home_state, sub.last_name, sub.age
-        FROM intermediate_sql.presidents_age sub
-        INNER JOIN intermediate_sql.presidents_agg sub2
-        ON sub.home_state = sub2.home_state AND sub.age = sub2.max_age
-        ORDER BY
-            age DESC,
-            home_state,
-            last_name
-        ;
-        ```
-        - `JOIN` condition handles the max age requirement.
+    ```sql
+    SELECT sub.home_state, sub.last_name, sub.age
+    FROM intermediate_sql.presidents_age sub
+    INNER JOIN intermediate_sql.presidents_agg sub2
+    ON sub.home_state = sub2.home_state AND sub.age = sub2.max_age
+    ORDER BY
+        age DESC,
+        home_state,
+        last_name
+    ;
+    ```
+    - `JOIN` condition handles the max age requirement.
 
 
 # Data Modeling

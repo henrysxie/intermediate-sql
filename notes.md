@@ -224,7 +224,9 @@
     4. Outermost query takes presidents whose state falls in that list.
 
 
-2. Get the oldest president in each state
+## Views
+
+1. Get the oldest president in each state
 
     A. Create a view for the age of the presidents
 
@@ -260,7 +262,7 @@
     FROM intermediate_sql.presidents_agg;
     ```
 
-    2C. Join our age table with our agg table
+    C. Join our age table with our agg table
 
     ```sql
     SELECT sub.home_state, sub.last_name, sub.age

@@ -1,14 +1,14 @@
-Welcome to Intermediate Python!
+## Welcome to Intermediate Python!
 
 Feel free to help yourselves to some refreshments.
 
-**Meanwhile, do the following:**
+### Meanwhile, do the following:
 
 A. Ensure [MySQL Workbench](https://dev.mysql.com/downloads/workbench/) is installed on your computer.
 
 B. Import data into MySQL workbench
 
-    1. Go to [https://github.com/henrysxie/intermediate-sql](https://github.com/henrysxie/intermediate-sql)
+    1. Go to https://github.com/henrysxie/intermediate-sql
 
     2. Scroll down to "Data sets"
 
